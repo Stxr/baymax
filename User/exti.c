@@ -106,7 +106,7 @@ void EXTI_PE3_Config(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO,ENABLE);
 	/* EXTI line gpio config*/
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;	 // 下拉输入
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;	 // 上拉输入
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
 	/* EXTI line mode config */
@@ -157,7 +157,7 @@ void EXTI_PE4_Config(void)
 	NVIC_Init(&NVIC_InitStructure);
 }
 //PE5
-void EXTI_PB5_Config(void)
+void EXTI_PE5_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	EXTI_InitTypeDef EXTI_InitStructure;
@@ -173,7 +173,7 @@ void EXTI_PB5_Config(void)
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);
 	EXTI_InitStructure.EXTI_Line = EXTI_Line5;
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising; //上升沿中断
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising; //下降沿中断
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
@@ -181,8 +181,8 @@ void EXTI_PB5_Config(void)
 
 	/* 配置中断源 */
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;  //抢占优先级
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;   //子优先级
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;  //抢占优先级
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;   //子优先级
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 }
@@ -193,7 +193,7 @@ void EXTI_InitConfig(void)
 	EXTI_PE2_Config();
 	EXTI_PE3_Config();
 	EXTI_PE4_Config();
-	EXTI_PB5_Config();
+	EXTI_PE5_Config();
 
 }
 /*********************************************END OF FILE**********************/

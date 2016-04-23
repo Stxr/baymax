@@ -15,6 +15,7 @@
 	void delay_us(u32 nus);
 	int match(char *a,char *b); //匹配函数两个值相同返回1，否则返回0
 	void clear(u16 a[]);//清除数组里的值
+	int getspeed(void);//测速
 */
 /*
 		IO口分配：:
@@ -33,7 +34,7 @@
 	// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//右上 检测到墙：2232  没有检测到物体：2712
 	// printf("11:%f\n",(float)Get_Adc_Average(ADC_Channel_11,50));//左上 检测到墙：2081  没有检测到物体：2831
 	// printf("12:%f\n",(float)Get_Adc_Average(ADC_Channel_12,50));//左   与墙平行：2851  没有检测到物体：3297
-	前轮测速模块：指示灯亮，低电平。灭，高电平。move(100,100)的时候，大概0.3s转变一次电平
+	前轮测速模块：指示灯亮，低电平。灭，高电平。move(100,100)的时候，大概0.3s转变一次电平 	前轮周长：6cm
 */
 #include "stm32f10x.h" //stm32官方头文件
 #include "delay.h"  //延时函数
@@ -43,11 +44,10 @@
 #include "usart_test.h" //串口
 #include "exti.h" //中断
 #include "tool.h" //一些工具
-// #include "tim.h"//tim1的初始化
 void wall(void);
 u16 usart3_buffer[64],usart3_rx=0,usart3_sta=0,i;//串口变量
 int flag_motor;//flag_motor是为了防止中断1和2重复执行
-int count=0;
+u16 count0=0,count1=0,count=0;
 /**************************************主函数****************************************/
 int main(void)
 {
@@ -57,7 +57,6 @@ int main(void)
 	ADC_InitConfig(); //ADC初始化
 	USART_Config(); //串口初始化
 	EXTI_InitConfig();//中断初始化
-	// Time1_Init();
 	LED5(0);
 	LED6(1);
 	speed(0,0);
@@ -69,9 +68,9 @@ int main(void)
 		// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//右上 检测到墙：2232  没有检测到物体：2712
 		// printf("11:%f\n",(float)Get_Adc_Average(ADC_Channel_11,50));//左上 检测到墙：2081  没有检测到物体：2831
 		// printf("12:%f\n",(float)Get_Adc_Average(ADC_Channel_12,50));//左   与墙平行：2851  没有检测到物体：3297
-    		printf("speed:%d\n",count);//左   与墙平行：2851  没有检测到物体：3297
-		// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_14,50)/4096*3.3*5);//通道14是电压检测器
-		// delay_ms(500);
+		printf("12:%d\n",getspeed());//左   与墙平行：2851  没有检测到物体：3297
+	//	USART_SendData(USART3,getspeed()+30);
+		 delay_ms(500);
 		LED5(0);
 		LED6(1);
 		if(!usart3_sta)//如果没有接收到串口信号
@@ -216,16 +215,19 @@ void EXTI4_IRQHandler(void)   //电机开关中断，中断为最高优先级
 }
 void EXTI9_5_IRQHandler(void)
 {
-	printf("spe");
 	if(EXTI_GetITStatus(EXTI_Line5)!=RESET)
 	{
-		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_5)==SET)
+		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_5)!=RESET)
 		{
-			count++;
-			delay_us(10);
+			delay_ms(10);
+			if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_5)!=RESET)
+			{
+				count++;
+				delay_ms(10);
+			}
 		}
-			EXTI_ClearITPendingBit(EXTI_Line5);  //清除EXTI4线路挂起位
 	}
+	EXTI_ClearITPendingBit(EXTI_Line5);
 }
 //定时器4中断服务程序
 void TIM4_IRQHandler(void)
@@ -307,5 +309,12 @@ void wall(void)
 		speed(800,800);
 	}
 }
-
+/*********************************测速**************************/
+int getspeed(void)
+{
+	count0=count1;
+	count1=count;
+	delay_ms(300);
+	return count1-count0;
+}
 /**************************END OF FILE*************************/

@@ -129,10 +129,10 @@ void TIM4_Init(u16 arr,u16 psc)
 int fputc(int ch, FILE *f)
 {
 	/* 发送一个字节数据到USART1 */
-	USART_SendData(USART1, (uint8_t) ch);
+	USART_SendData(USART3, (uint8_t) ch);
 
 	/* 等待发送完毕 */
-	while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+	while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
 
 	return (ch);
 }
@@ -141,8 +141,8 @@ int fputc(int ch, FILE *f)
 int fgetc(FILE *f)
 {
 	/* 等待串口1输入数据 */
-	while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
+	while (USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == RESET);
 
-	return (int)USART_ReceiveData(USART1);
+	return (int)USART_ReceiveData(USART3);
 }
 /*********************************************END OF FILE**********************/

@@ -7,7 +7,7 @@ void EXTI_PE1_Config(void);
 void EXTI_PE2_Config(void);
 void EXTI_PE3_Config(void);
 void EXTI_PE4_Config(void);
-void EXTI_PB5_Config(void);
+void EXTI_PE5_Config(void);
 void EXTI_InitConfig(void);
 
 #endif /* __EXTI_H */
