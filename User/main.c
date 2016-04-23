@@ -318,3 +318,4 @@ int getspeed(void)
 	return count1-count0;
 }
 /**************************END OF FILE*************************/
+//²âÊÔÒ»ÏÂgit
