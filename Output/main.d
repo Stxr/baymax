@@ -38,3 +38,4 @@
 ..\..\output\main.o: C:\Keil\ARM\ARMCC\bin\..\include\string.h
 ..\..\output\main.o: ..\..\User\exti.h
 ..\..\output\main.o: ..\..\User\tool.h
+..\..\output\main.o: ..\..\User\tim.h

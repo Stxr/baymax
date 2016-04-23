@@ -80,7 +80,7 @@ void USART3_Config(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-	TIM4_Init(999,7199);		//10ms中断
+	TIM4_Init(100-1,7200-1);		//10ms中断
 	usart3_rx=0;		//清零
 	TIM4_Set(0);			//关闭定时器4
 }

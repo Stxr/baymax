@@ -29,6 +29,7 @@
 */
 /*
 	特殊说明：
+	电机输出pwm用的是定时器2，串口通讯用的是定时器4，测速用定时器3
 	红外：没有检测到输出高电平，检测到输出低电平，采样次数为50的时候，阀值大概为2000
 	// printf("13:%f\n",(float)Get_Adc_Average(ADC_Channel_13,50));//右   与墙平行：2423  没有检测到物体：2689
 	// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//右上 检测到墙：2232  没有检测到物体：2712
@@ -44,10 +45,13 @@
 #include "usart_test.h" //串口
 #include "exti.h" //中断
 #include "tool.h" //一些工具
+#include "tim.h"
 void wall(void);
+// void getspeed(void);
 u16 usart3_buffer[64],usart3_rx=0,usart3_sta=0,i;//串口变量
 int flag_motor;//flag_motor是为了防止中断1和2重复执行
-u16 count0=0,count1=0,count=0;
+// u16 count0=0,count1=0,count=0;
+int count=0;
 /**************************************主函数****************************************/
 int main(void)
 {
@@ -57,6 +61,8 @@ int main(void)
 	ADC_InitConfig(); //ADC初始化
 	USART_Config(); //串口初始化
 	EXTI_InitConfig();//中断初始化
+	TIM3_Init();//定时器3初始化,默认关闭
+	// TIM3_Set(0);//关闭定时器3
 	LED5(0);
 	LED6(1);
 	speed(0,0);
@@ -68,7 +74,7 @@ int main(void)
 		// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//右上 检测到墙：2232  没有检测到物体：2712
 		// printf("11:%f\n",(float)Get_Adc_Average(ADC_Channel_11,50));//左上 检测到墙：2081  没有检测到物体：2831
 		// printf("12:%f\n",(float)Get_Adc_Average(ADC_Channel_12,50));//左   与墙平行：2851  没有检测到物体：3297
-		printf("12:%d\n",getspeed());//左   与墙平行：2851  没有检测到物体：3297
+		printf("12:%d\n",count);//左   与墙平行：2851  没有检测到物体：3297
 	//	USART_SendData(USART3,getspeed()+30);
 		 delay_ms(500);
 		LED5(0);
@@ -213,17 +219,19 @@ void EXTI4_IRQHandler(void)   //电机开关中断，中断为最高优先级
 		}
 	}
 }
+//测速中断
 void EXTI9_5_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line5)!=RESET)
 	{
 		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_5)!=RESET)
 		{
-			delay_ms(10);
+			delay_ms(1);
 			if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_5)!=RESET)
 			{
-				count++;
-				delay_ms(10);
+				TIM3_Set(1);//开定时器，并清空定时器
+				 count++; //测试用
+				// delay_ms(10);
 			}
 		}
 	}
@@ -235,8 +243,21 @@ void TIM4_IRQHandler(void)
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)//是更新中断
 	{
 		usart3_rx|=1<<15;	//标记接收完成
-		TIM_ClearITPendingBit(TIM4, TIM_IT_Update  );  //清除TIMx更新中断标志
+		TIM_ClearITPendingBit(TIM4, TIM_IT_Update );  //清除TIMx更新中断标志
 		TIM4_Set(0);			//关闭TIM4
+	}
+}
+//定时器3中断服务程序
+void TIM3_IRQHandler(void)
+{
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)//是更新中断
+	{
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update  );  //清除TIMx更新中断标志
+		TIM3_Set(0);			//关闭TIM4
+		move(-400,-400);
+		delay_ms(200);
+		move(-300,400);
+		delay_ms(300);
 	}
 }
 void USART1_IRQHandler(void)       //串口接收中断，并将接收到得数据发送出
@@ -310,11 +331,11 @@ void wall(void)
 	}
 }
 /*********************************测速**************************/
-int getspeed(void)
-{
-	count0=count1;
-	count1=count;
-	delay_ms(300);
-	return count1-count0;
-}
+// int getspeed(void)
+// {
+// 	count0=count1;
+// 	count1=count;
+// 	TIM3_Set(1);//开定时器
+// 	return count1-count0;
+// }
 /**************************END OF FILE*************************/
