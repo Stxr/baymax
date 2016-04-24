@@ -5,7 +5,7 @@ void TIM3_Init()
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);
-    TIM_TimeBaseStructure.TIM_Period=2000-1; //¼ÆÊıµ½2000Í£Ö¹
+    TIM_TimeBaseStructure.TIM_Period=2000-1; //è®¡æ•°åˆ°2000åœæ­¢
     TIM_TimeBaseStructure.TIM_Prescaler=36000-1;// 72MHz/3600=2KHz
     TIM_TimeBaseStructure.TIM_ClockDivision=TIM_CKD_DIV1;;
     TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;
@@ -13,18 +13,18 @@ void TIM3_Init()
 
     TIM3_Set(0);
     NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=1 ;//ÇÀÕ¼ÓÅÏÈ¼¶4
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;		//×ÓÓÅÏÈ¼¶3
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQÍ¨µÀÊ¹ÄÜ
-    NVIC_Init(&NVIC_InitStructure);	//¸ù¾İÖ¸¶¨µÄ²ÎÊı³õÊ¼»¯VIC¼Ä´æÆ÷
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=1 ;//æŠ¢å ä¼˜å…ˆçº§4
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;		//å­ä¼˜å…ˆçº§3
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQé€šé“ä½¿èƒ½
+    NVIC_Init(&NVIC_InitStructure);	//æ ¹æ®æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ–VICå¯„å­˜å™¨
 }
 void TIM3_Set(u8 sta)
 {
   if(sta)
     {
-      TIM_SetCounter(TIM3,0);//¼ÆÊıÆ÷Çå¿Õ
-      TIM_Cmd(TIM3, ENABLE); //Ê¹ÄÜTIMx
+      TIM_SetCounter(TIM3,0);//è®¡æ•°å™¨æ¸…ç©º
+      TIM_Cmd(TIM3, ENABLE); //ä½¿èƒ½TIMx
     }
   else
-    TIM_Cmd(TIM3, DISABLE);//¹Ø±Õ¶¨Ê±Æ÷3
+    TIM_Cmd(TIM3, DISABLE);//å…³é—­å®šæ—¶å™¨3
 }

@@ -1,67 +1,67 @@
-//µç×ÓÖÇÄÜ¹Ü¼Ò
+//ç”µå­æ™ºèƒ½ç®¡å®¶
 /*
-  º¯Êı¹¦ÄÜ±í£º
-  LED5(a)£º²âÊÔ³ÌĞò£¬aÎªÕæ£¬µãÁÁled5
-	void GPIO_LED_InitConfig(void); //led³õÊ¼»¯
-	void Motor_InitConfig(void); //³õÊ¼»¯º¯Êı
-  void speed(int a ,int b);//¿ØÖÆË¢×Ó
-  void move(int a,int b);//¿ØÖÆµç»ú
-	void ADC_InitConfig(void); //ADC³õÊ¼»¯
-	u16 Get_Adc_Average(ADC_Channel_10,u32 times); //ÇóADC×ª»»ºóµÄÆ½¾ùÖµ
-	void USART_Config(); //´®¿Ú³õÊ¼»¯
-	void EXTI_InitConfig(void);//ÖĞ¶Ï³õÊ¼»¯
-	void delay_init(void);  //ÑÓÊ±º¯Êı³õÊ¼»¯
+  å‡½æ•°åŠŸèƒ½è¡¨ï¼š
+  LED5(a)ï¼šæµ‹è¯•ç¨‹åºï¼Œaä¸ºçœŸï¼Œç‚¹äº®led5
+	void GPIO_LED_InitConfig(void); //ledåˆå§‹åŒ–
+	void Motor_InitConfig(void); //åˆå§‹åŒ–å‡½æ•°
+  void speed(int a ,int b);//æ§åˆ¶åˆ·å­
+  void move(int a,int b);//æ§åˆ¶ç”µæœº
+	void ADC_InitConfig(void); //ADCåˆå§‹åŒ–
+	u16 Get_Adc_Average(ADC_Channel_10,u32 times); //æ±‚ADCè½¬æ¢åçš„å¹³å‡å€¼
+	void USART_Config(); //ä¸²å£åˆå§‹åŒ–
+	void EXTI_InitConfig(void);//ä¸­æ–­åˆå§‹åŒ–
+	void delay_init(void);  //å»¶æ—¶å‡½æ•°åˆå§‹åŒ–
 	void delay_ms(u16 nms);
 	void delay_us(u32 nus);
-	int match(char *a,char *b); //Æ¥Åäº¯ÊıÁ½¸öÖµÏàÍ¬·µ»Ø1£¬·ñÔò·µ»Ø0
-	void clear(u16 a[]);//Çå³ıÊı×éÀïµÄÖµ
-	int getspeed(void);//²âËÙ
+	int match(char *a,char *b); //åŒ¹é…å‡½æ•°ä¸¤ä¸ªå€¼ç›¸åŒè¿”å›1ï¼Œå¦åˆ™è¿”å›0
+	void clear(u16 a[]);//æ¸…é™¤æ•°ç»„é‡Œçš„å€¼
+	int getspeed(void);//æµ‹é€Ÿ
 */
 /*
-		IO¿Ú·ÖÅä£º:
-		motor£º    PA0 PA1 PA2 PA3 ·Ö±ğ¶ÔÓ¦TIM2 µÄch1 ch2 ch3 ch4  ch1ºÍch2¿ØÖÆµç»ú ch3ºÍch4¿ØÖÆË¢×Ó  ¡ª¡ªpwm²¨
-               PA4 PA5 PA6 PA7 ¿ØÖÆ»úÆ÷ÈËµç»úÕı·´×ª
-		adc£º      PC0 ,PC1, PC2, PC3·Ö±ğ¶ÔÓ¦ADC1_IN10 ADC1_IN11 ADC1_IN12 ADC1_IN13
-							 PC4 ¿ØÖÆµçÁ¿¾¯¸æ£¬ADC_IN14
-		usart1£º   PA9:tx  PA10:rx
+		IOå£åˆ†é…ï¼š:
+		motorï¼š    PA0 PA1 PA2 PA3 åˆ†åˆ«å¯¹åº”TIM2 çš„ch1 ch2 ch3 ch4  ch1å’Œch2æ§åˆ¶ç”µæœº ch3å’Œch4æ§åˆ¶åˆ·å­  â€”â€”pwmæ³¢
+               PA4 PA5 PA6 PA7 æ§åˆ¶æœºå™¨äººç”µæœºæ­£åè½¬
+		adcï¼š      PC0 ,PC1, PC2, PC3åˆ†åˆ«å¯¹åº”ADC1_IN10 ADC1_IN11 ADC1_IN12 ADC1_IN13
+							 PC4 æ§åˆ¶ç”µé‡è­¦å‘Šï¼ŒADC_IN14
+		usart1ï¼š   PA9:tx  PA10:rx
 		usartt3:   PD8:tx PD9:rx
 		exti:      PE0 PE1 PE2 PE3 PE4
 */
 /*
-	ÌØÊâËµÃ÷£º
-	µç»úÊä³öpwmÓÃµÄÊÇ¶¨Ê±Æ÷2£¬´®¿ÚÍ¨Ñ¶ÓÃµÄÊÇ¶¨Ê±Æ÷4£¬²âËÙÓÃ¶¨Ê±Æ÷3
-	ºìÍâ£ºÃ»ÓĞ¼ì²âµ½Êä³ö¸ßµçÆ½£¬¼ì²âµ½Êä³öµÍµçÆ½£¬²ÉÑù´ÎÊıÎª50µÄÊ±ºò£¬·§Öµ´ó¸ÅÎª2000
-	// printf("13:%f\n",(float)Get_Adc_Average(ADC_Channel_13,50));//ÓÒ   ÓëÇ½Æ½ĞĞ£º2423  Ã»ÓĞ¼ì²âµ½ÎïÌå£º2689
-	// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//ÓÒÉÏ ¼ì²âµ½Ç½£º2232  Ã»ÓĞ¼ì²âµ½ÎïÌå£º2712
-	// printf("11:%f\n",(float)Get_Adc_Average(ADC_Channel_11,50));//×óÉÏ ¼ì²âµ½Ç½£º2081  Ã»ÓĞ¼ì²âµ½ÎïÌå£º2831
-	// printf("12:%f\n",(float)Get_Adc_Average(ADC_Channel_12,50));//×ó   ÓëÇ½Æ½ĞĞ£º2851  Ã»ÓĞ¼ì²âµ½ÎïÌå£º3297
-	Ç°ÂÖ²âËÙÄ£¿é£ºÖ¸Ê¾µÆÁÁ£¬µÍµçÆ½¡£Ãğ£¬¸ßµçÆ½¡£move(100,100)µÄÊ±ºò£¬´ó¸Å0.3s×ª±äÒ»´ÎµçÆ½ 	Ç°ÂÖÖÜ³¤£º6cm
+	ç‰¹æ®Šè¯´æ˜ï¼š
+	ç”µæœºè¾“å‡ºpwmç”¨çš„æ˜¯å®šæ—¶å™¨2ï¼Œä¸²å£é€šè®¯ç”¨çš„æ˜¯å®šæ—¶å™¨4ï¼Œæµ‹é€Ÿç”¨å®šæ—¶å™¨3
+	çº¢å¤–ï¼šæ²¡æœ‰æ£€æµ‹åˆ°è¾“å‡ºé«˜ç”µå¹³ï¼Œæ£€æµ‹åˆ°è¾“å‡ºä½ç”µå¹³ï¼Œé‡‡æ ·æ¬¡æ•°ä¸º50çš„æ—¶å€™ï¼Œé˜€å€¼å¤§æ¦‚ä¸º2000
+	// printf("13:%f\n",(float)Get_Adc_Average(ADC_Channel_13,50));//å³   ä¸å¢™å¹³è¡Œï¼š2423  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š2689
+	// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//å³ä¸Š æ£€æµ‹åˆ°å¢™ï¼š2232  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š2712
+	// printf("11:%f\n",(float)Get_Adc_Average(ADC_Channel_11,50));//å·¦ä¸Š æ£€æµ‹åˆ°å¢™ï¼š2081  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š2831
+	// printf("12:%f\n",(float)Get_Adc_Average(ADC_Channel_12,50));//å·¦   ä¸å¢™å¹³è¡Œï¼š2851  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š3297
+	å‰è½®æµ‹é€Ÿæ¨¡å—ï¼šæŒ‡ç¤ºç¯äº®ï¼Œä½ç”µå¹³ã€‚ç­ï¼Œé«˜ç”µå¹³ã€‚move(100,100)çš„æ—¶å€™ï¼Œå¤§æ¦‚0.3sè½¬å˜ä¸€æ¬¡ç”µå¹³ 	å‰è½®å‘¨é•¿ï¼š6cm
 */
-#include "stm32f10x.h" //stm32¹Ù·½Í·ÎÄ¼ş
-#include "delay.h"  //ÑÓÊ±º¯Êı
-#include "led_test.h" //ledµÆ
-#include "motor.h"  //µç»ú
+#include "stm32f10x.h" //stm32å®˜æ–¹å¤´æ–‡ä»¶
+#include "delay.h"  //å»¶æ—¶å‡½æ•°
+#include "led_test.h" //ledç¯
+#include "motor.h"  //ç”µæœº
 #include "adc.h"   //AD
-#include "usart_test.h" //´®¿Ú
-#include "exti.h" //ÖĞ¶Ï
-#include "tool.h" //Ò»Ğ©¹¤¾ß
+#include "usart_test.h" //ä¸²å£
+#include "exti.h" //ä¸­æ–­
+#include "tool.h" //ä¸€äº›å·¥å…·
 #include "tim.h"
 void wall(void);
 // void getspeed(void);
-u16 usart3_buffer[64],usart3_rx=0,usart3_sta=0,i;//´®¿Ú±äÁ¿
-int flag_motor;//flag_motorÊÇÎªÁË·ÀÖ¹ÖĞ¶Ï1ºÍ2ÖØ¸´Ö´ĞĞ
+u16 usart3_buffer[64],usart3_rx=0,usart3_sta=0,i;//ä¸²å£å˜é‡
+int flag_motor;//flag_motoræ˜¯ä¸ºäº†é˜²æ­¢ä¸­æ–­1å’Œ2é‡å¤æ‰§è¡Œ
 // u16 count0=0,count1=0,count=0;
 int count=0;
-/**************************************Ö÷º¯Êı****************************************/
+/**************************************ä¸»å‡½æ•°****************************************/
 int main(void)
 {
-	delay_init();  //ÑÓÊ±º¯Êı³õÊ¼»¯
+	delay_init();  //å»¶æ—¶å‡½æ•°åˆå§‹åŒ–
 	GPIO_LED_InitConfig();
-	Motor_InitConfig();  //µç»ú³õÊ¼»¯
-	ADC_InitConfig(); //ADC³õÊ¼»¯
-	USART_Config(); //´®¿Ú³õÊ¼»¯
-	EXTI_InitConfig();//ÖĞ¶Ï³õÊ¼»¯
-	TIM3_Init();//¶¨Ê±Æ÷3³õÊ¼»¯,Ä¬ÈÏ¹Ø±Õ
+	Motor_InitConfig();  //ç”µæœºåˆå§‹åŒ–
+	ADC_InitConfig(); //ADCåˆå§‹åŒ–
+	USART_Config(); //ä¸²å£åˆå§‹åŒ–
+	EXTI_InitConfig();//ä¸­æ–­åˆå§‹åŒ–
+	TIM3_Init();//å®šæ—¶å™¨3åˆå§‹åŒ–,é»˜è®¤å…³é—­
 
 	LED5(0);
 	LED6(1);
@@ -70,31 +70,31 @@ int main(void)
 	delay_ms(100);
 	while(1)
 	{
-		// printf("13:%f\n",(float)Get_Adc_Average(ADC_Channel_13,50));//ÓÒ   ÓëÇ½Æ½ĞĞ£º2423  Ã»ÓĞ¼ì²âµ½ÎïÌå£º2689
-		// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//ÓÒÉÏ ¼ì²âµ½Ç½£º2232  Ã»ÓĞ¼ì²âµ½ÎïÌå£º2712
-		// printf("11:%f\n",(float)Get_Adc_Average(ADC_Channel_11,50));//×óÉÏ ¼ì²âµ½Ç½£º2081  Ã»ÓĞ¼ì²âµ½ÎïÌå£º2831
-		// printf("12:%f\n",(float)Get_Adc_Average(ADC_Channel_12,50));//×ó   ÓëÇ½Æ½ĞĞ£º2851  Ã»ÓĞ¼ì²âµ½ÎïÌå£º3297
-		// printf("12:%d\n",count);//×ó   ÓëÇ½Æ½ĞĞ£º2851  Ã»ÓĞ¼ì²âµ½ÎïÌå£º3297
+		// printf("13:%f\n",(float)Get_Adc_Average(ADC_Channel_13,50));//å³   ä¸å¢™å¹³è¡Œï¼š2423  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š2689
+		// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//å³ä¸Š æ£€æµ‹åˆ°å¢™ï¼š2232  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š2712
+		// printf("11:%f\n",(float)Get_Adc_Average(ADC_Channel_11,50));//å·¦ä¸Š æ£€æµ‹åˆ°å¢™ï¼š2081  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š2831
+		// printf("12:%f\n",(float)Get_Adc_Average(ADC_Channel_12,50));//å·¦   ä¸å¢™å¹³è¡Œï¼š2851  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š3297
+		// printf("12:%d\n",count);//å·¦   ä¸å¢™å¹³è¡Œï¼š2851  æ²¡æœ‰æ£€æµ‹åˆ°ç‰©ä½“ï¼š3297
 		//USART_SendData(USART3,getspeed()+30);
 		// delay_ms(500);
-		TIM_Cmd(TIM3, ENABLE);  //Ê¹ÄÜTIMx
+		TIM_Cmd(TIM3, ENABLE);  //ä½¿èƒ½TIMx
 		LED5(0);
 		LED6(1);
-		if(!usart3_sta)//Èç¹ûÃ»ÓĞ½ÓÊÕµ½´®¿ÚĞÅºÅ
+		if(!usart3_sta)//å¦‚æœæ²¡æœ‰æ¥æ”¶åˆ°ä¸²å£ä¿¡å·
 		{
 			wall();
 		}
-		/***************************************ÎŞÏß¿ØÖÆ²¿·Ö****************************************/
+		/***************************************æ— çº¿æ§åˆ¶éƒ¨åˆ†****************************************/
 		else
 		{
-			if(usart3_rx&0x8000)  //½ÓÊÕµ½Ò»´ÎÊı¾İ
+			if(usart3_rx&0x8000)  //æ¥æ”¶åˆ°ä¸€æ¬¡æ•°æ®
 			{
 				char a[LEN];
 				for(i=0; i<LEN; i++)
 				{
-					a[i]=usart3_buffer[i]; //°Ñ´®¿ÚµÄÊı¾İ·ÅÈëÊı×éÀïÃæ
+					a[i]=usart3_buffer[i]; //æŠŠä¸²å£çš„æ•°æ®æ”¾å…¥æ•°ç»„é‡Œé¢
 					USART_SendData(USART3,a[i]);
-					while(USART_GetFlagStatus(USART3,USART_FLAG_TXE) == RESET);//ÎªÁËÄÜ¹»ÔÚ´®¿ÚÉÏÏÔÊ¾³öÀ´
+					while(USART_GetFlagStatus(USART3,USART_FLAG_TXE) == RESET);//ä¸ºäº†èƒ½å¤Ÿåœ¨ä¸²å£ä¸Šæ˜¾ç¤ºå‡ºæ¥
 				}
 				if(match(a,"up"))
 				{
@@ -125,14 +125,14 @@ int main(void)
 				}
 				else usart3_sta=0;
 				usart3_rx=0;
-				clear(usart3_buffer);//Çå³ı»º´æ
+				clear(usart3_buffer);//æ¸…é™¤ç¼“å­˜
 			}
 		}
 	}
 }
 
-/***************************************ÖĞ¶Ï*******************************************/
-void EXTI0_IRQHandler(void) //×ó±ß
+/***************************************ä¸­æ–­*******************************************/
+void EXTI0_IRQHandler(void) //å·¦è¾¹
 {
 	if(EXTI_GetITStatus(EXTI_Line1) != RESET)
 	{
@@ -140,10 +140,10 @@ void EXTI0_IRQHandler(void) //×ó±ß
 		while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_1)!=RESET)
 			move(500,-200);
 	}
-	while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_0)!=RESET);//µ±¼ì²âµ½µÍµçÆ½µÄÊ±ºò£¬²ÅÀë¿ªÖĞ¶Ï
-	EXTI_ClearITPendingBit(EXTI_Line0);  //Çå³ıEXTI0ÏßÂ·¹ÒÆğÎ»
+	while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_0)!=RESET);//å½“æ£€æµ‹åˆ°ä½ç”µå¹³çš„æ—¶å€™ï¼Œæ‰ç¦»å¼€ä¸­æ–­
+	EXTI_ClearITPendingBit(EXTI_Line0);  //æ¸…é™¤EXTI0çº¿è·¯æŒ‚èµ·ä½
 }
-void EXTI1_IRQHandler(void) //×óÉÏ½ÇÖĞ¶Ï
+void EXTI1_IRQHandler(void) //å·¦ä¸Šè§’ä¸­æ–­
 {
 	if(EXTI_GetITStatus(EXTI_Line1) != RESET)
 	{
@@ -152,7 +152,7 @@ void EXTI1_IRQHandler(void) //×óÉÏ½ÇÖĞ¶Ï
 			LED5(1);
 			move(0,0);
 			delay_ms(100);
-			while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_1)!=RESET||GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_2)!=RESET)//µ±¼ì²âµ½µÍµçÆ½µÄÊ±ºò
+			while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_1)!=RESET||GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_2)!=RESET)//å½“æ£€æµ‹åˆ°ä½ç”µå¹³çš„æ—¶å€™
 				move(-400,-400);
 			delay_ms(500);
 			LED6(0);
@@ -163,9 +163,9 @@ void EXTI1_IRQHandler(void) //×óÉÏ½ÇÖĞ¶Ï
 			flag_motor=0;
 		}
 	}
-	EXTI_ClearITPendingBit(EXTI_Line1);  //Çå³ıEXTI1ÏßÂ·¹ÒÆğÎ»
+	EXTI_ClearITPendingBit(EXTI_Line1);  //æ¸…é™¤EXTI1çº¿è·¯æŒ‚èµ·ä½
 }
-void EXTI2_IRQHandler(void) //ÓÒÉÏ½ÇÖĞ¶Ï
+void EXTI2_IRQHandler(void) //å³ä¸Šè§’ä¸­æ–­
 {
 	if(EXTI_GetITStatus(EXTI_Line2) != RESET)
 	{
@@ -174,7 +174,7 @@ void EXTI2_IRQHandler(void) //ÓÒÉÏ½ÇÖĞ¶Ï
 			LED5(1);
 			move(0,0);
 			delay_ms(100);
-			while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_2)!=RESET||GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_1)!=RESET)//µ±¼ì²âµ½µÍµçÆ½µÄÊ±ºò£¬²ÅÀë¿ªÖĞ¶Ï
+			while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_2)!=RESET||GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_1)!=RESET)//å½“æ£€æµ‹åˆ°ä½ç”µå¹³çš„æ—¶å€™ï¼Œæ‰ç¦»å¼€ä¸­æ–­
 				move(-400,-400);
 			delay_ms(500);
 			LED6(0);
@@ -185,9 +185,9 @@ void EXTI2_IRQHandler(void) //ÓÒÉÏ½ÇÖĞ¶Ï
 			flag_motor=0;
 		}
 	}
-	EXTI_ClearITPendingBit(EXTI_Line2);  //Çå³ıEXTI2ÏßÂ·¹ÒÆğÎ»
+	EXTI_ClearITPendingBit(EXTI_Line2);  //æ¸…é™¤EXTI2çº¿è·¯æŒ‚èµ·ä½
 }
-void EXTI3_IRQHandler(void)//ÓÒ±ß
+void EXTI3_IRQHandler(void)//å³è¾¹
 {
 	if(EXTI_GetITStatus(EXTI_Line3) != RESET)
 	{
@@ -196,14 +196,14 @@ void EXTI3_IRQHandler(void)//ÓÒ±ß
 			move(-200,500);
 
 	}
-	while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_3)!=RESET);//µ±¼ì²âµ½µÍµçÆ½µÄÊ±ºò£¬²ÅÀë¿ªÖĞ¶Ï
-	EXTI_ClearITPendingBit(EXTI_Line3);  //Çå³ıEXTI3ÏßÂ·¹ÒÆğÎ»
+	while(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_3)!=RESET);//å½“æ£€æµ‹åˆ°ä½ç”µå¹³çš„æ—¶å€™ï¼Œæ‰ç¦»å¼€ä¸­æ–­
+	EXTI_ClearITPendingBit(EXTI_Line3);  //æ¸…é™¤EXTI3çº¿è·¯æŒ‚èµ·ä½
 }
-void EXTI4_IRQHandler(void)   //µç»ú¿ª¹ØÖĞ¶Ï£¬ÖĞ¶ÏÎª×î¸ßÓÅÏÈ¼¶
+void EXTI4_IRQHandler(void)   //ç”µæœºå¼€å…³ä¸­æ–­ï¼Œä¸­æ–­ä¸ºæœ€é«˜ä¼˜å…ˆçº§
 {
 	if(EXTI_GetITStatus(EXTI_Line4) != RESET)
 	{
-		if(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_4)==RESET)   //µÍµçÆ½£¨µ±µç»úÂÖ×ÓÌ§ÆğÀ´µÄÊ±ºò£¬Î¢¶¯¿ª¹Ø¹Ø±Õ£¬ÎªµÍµçÆ½£©
+		if(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_4)==RESET)   //ä½ç”µå¹³ï¼ˆå½“ç”µæœºè½®å­æŠ¬èµ·æ¥çš„æ—¶å€™ï¼Œå¾®åŠ¨å¼€å…³å…³é—­ï¼Œä¸ºä½ç”µå¹³ï¼‰
 		{
 			delay_us(10);
 			if(GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_4)==RESET)
@@ -215,45 +215,45 @@ void EXTI4_IRQHandler(void)   //µç»ú¿ª¹ØÖĞ¶Ï£¬ÖĞ¶ÏÎª×î¸ßÓÅÏÈ¼¶
 		}
 		else
 		{
-			EXTI_ClearITPendingBit(EXTI_Line4);  //Çå³ıEXTI4ÏßÂ·¹ÒÆğÎ»
+			EXTI_ClearITPendingBit(EXTI_Line4);  //æ¸…é™¤EXTI4çº¿è·¯æŒ‚èµ·ä½
 		}
 	}
 }
-//²âËÙÖĞ¶Ï
+//æµ‹é€Ÿä¸­æ–­
 void EXTI9_5_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line5)!=RESET)
 	{
 		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_5)!=RESET)
 		{
-				TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE );//¿ªÆô¶¨Ê±Æ÷3µÄÖĞ¶Ï
-				TIM_SetCounter(TIM3,0);//¼ÆÊıÆ÷Çå¿Õ
-				 count++; //²âÊÔÓÃ
+				TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE );//å¼€å¯å®šæ—¶å™¨3çš„ä¸­æ–­
+				TIM_SetCounter(TIM3,0);//è®¡æ•°å™¨æ¸…ç©º
+				 count++; //æµ‹è¯•ç”¨
 				// delay_ms(10);
 		}
 
 	}
 	EXTI_ClearITPendingBit(EXTI_Line5);
 }
-//¶¨Ê±Æ÷4ÖĞ¶Ï·şÎñ³ÌĞò
+//å®šæ—¶å™¨4ä¸­æ–­æœåŠ¡ç¨‹åº
 void TIM4_IRQHandler(void)
 {
-	if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)//ÊÇ¸üĞÂÖĞ¶Ï
+	if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)//æ˜¯æ›´æ–°ä¸­æ–­
 	{
-		usart3_rx|=1<<15;	//±ê¼Ç½ÓÊÕÍê³É
-		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);  //Çå³ıTIMx¸üĞÂÖĞ¶Ï±êÖ¾
-		TIM4_Set(0);			//¹Ø±ÕTIM4
+		usart3_rx|=1<<15;	//æ ‡è®°æ¥æ”¶å®Œæˆ
+		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);  //æ¸…é™¤TIMxæ›´æ–°ä¸­æ–­æ ‡å¿—
+		TIM4_Set(0);			//å…³é—­TIM4
 	}
 }
-//¶¨Ê±Æ÷3ÖĞ¶Ï·şÎñ³ÌĞò
+//å®šæ—¶å™¨3ä¸­æ–­æœåŠ¡ç¨‹åº
 void TIM3_IRQHandler(void)
 {
-	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)//ÊÇ¸üĞÂÖĞ¶Ï
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)//æ˜¯æ›´æ–°ä¸­æ–­
 	{
-		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);  //Çå³ıTIMx¸üĞÂÖĞ¶Ï±êÖ¾
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);  //æ¸…é™¤TIMxæ›´æ–°ä¸­æ–­æ ‡å¿—
 		if(!usart3_sta)
 		{
-			TIM3_Set(0);			//¹Ø±ÕTIM3
+			TIM3_Set(0);			//å…³é—­TIM3
 			move(0,0);
 			delay_ms(10);
 			move(-400,-400);
@@ -266,68 +266,68 @@ void TIM3_IRQHandler(void)
 	}
 
 }
-void USART1_IRQHandler(void)       //´®¿Ú½ÓÊÕÖĞ¶Ï£¬²¢½«½ÓÊÕµ½µÃÊı¾İ·¢ËÍ³ö
+void USART1_IRQHandler(void)       //ä¸²å£æ¥æ”¶ä¸­æ–­ï¼Œå¹¶å°†æ¥æ”¶åˆ°å¾—æ•°æ®å‘é€å‡º
 {
 
-	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)//ÅĞ¶Ï ÊÇ·ñ ½ÓÊÕÖĞ¶Ï
+	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)//åˆ¤æ–­ æ˜¯å¦ æ¥æ”¶ä¸­æ–­
 	{
 		uint16_t temp_trx[2],i;
 		LED5(1);
 		for(i=0; i<2; i++)
 			temp_trx[i]=USART_ReceiveData(USART1);
 		USART_SendData(USART1,temp_trx[1]);
-		while(USART_GetFlagStatus(USART1,USART_FLAG_TXE) == RESET);//ÅĞ¶Ï ·¢ËÍ±êÖ¾
+		while(USART_GetFlagStatus(USART1,USART_FLAG_TXE) == RESET);//åˆ¤æ–­ å‘é€æ ‡å¿—
 		USART_ClearITPendingBit(USART1,USART_IT_RXNE);
 	}
 }
 
-void USART3_IRQHandler(void)       //´®¿Ú½ÓÊÕÖĞ¶Ï£¬²¢½«½ÓÊÕµ½µÃÊı¾İ·¢ËÍ³ö
+void USART3_IRQHandler(void)       //ä¸²å£æ¥æ”¶ä¸­æ–­ï¼Œå¹¶å°†æ¥æ”¶åˆ°å¾—æ•°æ®å‘é€å‡º
 {
-	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)//ÅĞ¶Ï ÊÇ·ñ ½ÓÊÕÖĞ¶Ï
+	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)//åˆ¤æ–­ æ˜¯å¦ æ¥æ”¶ä¸­æ–­
 	{
 		USART_ClearITPendingBit(USART3,USART_IT_RXNE);
-		usart3_sta=1; //´®¿Ú3ÖĞ¶Ï±êÖ¾Î»
+		usart3_sta=1; //ä¸²å£3ä¸­æ–­æ ‡å¿—ä½
 		LED5(1);
-		TIM_SetCounter(TIM4,0);//¶¨Ê±Æ÷Çå¿Õ£¨·Ç³£ÖØÒª)
-		if(usart3_rx==0) TIM4_Set(1);//¿ªÆô¶¨Ê±Æ÷
+		TIM_SetCounter(TIM4,0);//å®šæ—¶å™¨æ¸…ç©ºï¼ˆéå¸¸é‡è¦)
+		if(usart3_rx==0) TIM4_Set(1);//å¼€å¯å®šæ—¶å™¨
 		if(usart3_rx<LEN)
 		{
 			usart3_buffer[usart3_rx++]=USART_ReceiveData(USART3);
 		}
 		else
 		{
-			usart3_rx|=1<<15; //Ç¿ÖÆ½ÓÊÕ
+			usart3_rx|=1<<15; //å¼ºåˆ¶æ¥æ”¶
 		}
 	}
 }
-/***********************************·ÀÖ¹×²Ç½³ÌĞò*************************************/
+/***********************************é˜²æ­¢æ’å¢™ç¨‹åº*************************************/
 void wall(void)
 {
 	flag_motor=1;
-	if((float)Get_Adc_Average(ADC_Channel_10,50)<2000)//ÓÒÉÏ
+	if((float)Get_Adc_Average(ADC_Channel_10,50)<2000)//å³ä¸Š
 	{
 		LED6(0);
 		move(0,0);
 		delay_ms(10);
-		move(-300,400);//×ó¹Õ
+		move(-300,400);//å·¦æ‹
 		delay_ms(300);
 	}
-	else if((float)Get_Adc_Average(ADC_Channel_11,50)<2000)//×óÉÏ
+	else if((float)Get_Adc_Average(ADC_Channel_11,50)<2000)//å·¦ä¸Š
 	{
 		LED6(0);
 		move(0,0);
 		delay_ms(10);
-		move(400,-300);//ÓÒ¹Õ
+		move(400,-300);//å³æ‹
 		delay_ms(500);
 	}
-	else if((float)Get_Adc_Average(ADC_Channel_12,50)<2000)//×ó
+	else if((float)Get_Adc_Average(ADC_Channel_12,50)<2000)//å·¦
 	{
-		move(400,-300);//ÓÒ¹Õ
+		move(400,-300);//å³æ‹
 		delay_ms(200);
 	}
-	else if((float)Get_Adc_Average(ADC_Channel_13,50)<2000)//ÓÒ
+	else if((float)Get_Adc_Average(ADC_Channel_13,50)<2000)//å³
 	{
-		move(-300,400);//×ó¹Õ
+		move(-300,400);//å·¦æ‹
 		delay_ms(100);
 	}
 	else
@@ -336,12 +336,12 @@ void wall(void)
 		speed(800,800);
 	}
 }
-/*********************************²âËÙ**************************/
+/*********************************æµ‹é€Ÿ**************************/
 // int getspeed(void)
 // {
 // 	count0=count1;
 // 	count1=count;
-// 	TIM3_Set(1);//¿ª¶¨Ê±Æ÷
+// 	TIM3_Set(1);//å¼€å®šæ—¶å™¨
 // 	return count1-count0;
 // }
 /**************************END OF FILE*************************/

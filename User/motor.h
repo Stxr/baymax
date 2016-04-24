@@ -1,4 +1,4 @@
 #include "stm32f10x.h"
-void Motor_InitConfig(void); //³õÊ¼»¯º¯Êı
-void speed(int a ,int b);//¿ØÖÆË¢×Ó
-void move(int a,int b);//¿ØÖÆµç»ú
+void Motor_InitConfig(void); //åˆå§‹åŒ–å‡½æ•°
+void speed(int a ,int b);//æ§åˆ¶åˆ·å­
+void move(int a,int b);//æ§åˆ¶ç”µæœº
