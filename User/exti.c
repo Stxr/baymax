@@ -182,7 +182,7 @@ void EXTI_PE5_Config(void)
 	/* 配置中断源 */
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;  //抢占优先级
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;   //子优先级
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;   //子优先级
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 }

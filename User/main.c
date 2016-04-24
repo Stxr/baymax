@@ -62,7 +62,7 @@ int main(void)
 	USART_Config(); //串口初始化
 	EXTI_InitConfig();//中断初始化
 	TIM3_Init();//定时器3初始化,默认关闭
-	// TIM3_Set(0);//关闭定时器3
+
 	LED5(0);
 	LED6(1);
 	speed(0,0);
@@ -74,9 +74,10 @@ int main(void)
 		// printf("10:%f\n",(float)Get_Adc_Average(ADC_Channel_10,50));//右上 检测到墙：2232  没有检测到物体：2712
 		// printf("11:%f\n",(float)Get_Adc_Average(ADC_Channel_11,50));//左上 检测到墙：2081  没有检测到物体：2831
 		// printf("12:%f\n",(float)Get_Adc_Average(ADC_Channel_12,50));//左   与墙平行：2851  没有检测到物体：3297
-		printf("12:%d\n",count);//左   与墙平行：2851  没有检测到物体：3297
-	//	USART_SendData(USART3,getspeed()+30);
-		 delay_ms(500);
+		// printf("12:%d\n",count);//左   与墙平行：2851  没有检测到物体：3297
+		//USART_SendData(USART3,getspeed()+30);
+		// delay_ms(500);
+		TIM_Cmd(TIM3, ENABLE);  //使能TIMx
 		LED5(0);
 		LED6(1);
 		if(!usart3_sta)//如果没有接收到串口信号
@@ -129,7 +130,6 @@ int main(void)
 		}
 	}
 }
-
 
 /***************************************中断*******************************************/
 void EXTI0_IRQHandler(void) //左边
@@ -226,14 +226,12 @@ void EXTI9_5_IRQHandler(void)
 	{
 		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_5)!=RESET)
 		{
-			delay_ms(1);
-			if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_5)!=RESET)
-			{
-				TIM3_Set(1);//开定时器，并清空定时器
+				TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE );//开启定时器3的中断
+				TIM_SetCounter(TIM3,0);//计数器清空
 				 count++; //测试用
 				// delay_ms(10);
-			}
 		}
+
 	}
 	EXTI_ClearITPendingBit(EXTI_Line5);
 }
@@ -243,7 +241,7 @@ void TIM4_IRQHandler(void)
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)//是更新中断
 	{
 		usart3_rx|=1<<15;	//标记接收完成
-		TIM_ClearITPendingBit(TIM4, TIM_IT_Update );  //清除TIMx更新中断标志
+		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);  //清除TIMx更新中断标志
 		TIM4_Set(0);			//关闭TIM4
 	}
 }
@@ -252,13 +250,21 @@ void TIM3_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)//是更新中断
 	{
-		TIM_ClearITPendingBit(TIM3, TIM_IT_Update  );  //清除TIMx更新中断标志
-		TIM3_Set(0);			//关闭TIM4
-		move(-400,-400);
-		delay_ms(200);
-		move(-300,400);
-		delay_ms(300);
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);  //清除TIMx更新中断标志
+		if(!usart3_sta)
+		{
+			TIM3_Set(0);			//关闭TIM3
+			move(0,0);
+			delay_ms(10);
+			move(-400,-400);
+			delay_ms(400);
+			move(-300,400);
+			delay_ms(400);
+			count=-1;
+			printf("tim3\n");
+		}
 	}
+
 }
 void USART1_IRQHandler(void)       //串口接收中断，并将接收到得数据发送出
 {
@@ -312,17 +318,17 @@ void wall(void)
 		move(0,0);
 		delay_ms(10);
 		move(400,-300);//右拐
-		delay_ms(300);
+		delay_ms(500);
 	}
 	else if((float)Get_Adc_Average(ADC_Channel_12,50)<2000)//左
 	{
 		move(400,-300);//右拐
-		delay_ms(50);
+		delay_ms(200);
 	}
 	else if((float)Get_Adc_Average(ADC_Channel_13,50)<2000)//右
 	{
 		move(-300,400);//左拐
-		delay_ms(50);
+		delay_ms(100);
 	}
 	else
 	{
