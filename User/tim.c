@@ -20,11 +20,11 @@ void TIM3_Init()
 }
 void TIM3_Set(u8 sta)
 {
-  if(sta)
-    {
-      TIM_SetCounter(TIM3,0);//计数器清空
-      TIM_Cmd(TIM3, ENABLE); //使能TIMx
-    }
-  else
-    TIM_Cmd(TIM3, DISABLE);//关闭定时器3
+    if(sta)
+        {
+            TIM_SetCounter(TIM3,0);//计数器清空
+            TIM_Cmd(TIM3, ENABLE); //使能TIMx
+        }
+    else
+        TIM_Cmd(TIM3, DISABLE);//关闭定时器3
 }
