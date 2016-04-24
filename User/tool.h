@@ -1,4 +1,4 @@
 #include <stdio.h>
 #include "stm32f10x.h"
-int match(char *a,char *b); //Æ¥Åäº¯ÊıÁ½¸öÖµÏàÍ¬·µ»Ø1£¬·ñÔò·µ»Ø0
-void clear(u16 a[]);//Çå³ıÊı×éÀïµÄÖµ
+int match(char *a,char *b); //åŒ¹é…å‡½æ•°ä¸¤ä¸ªå€¼ç›¸åŒè¿”å›1ï¼Œå¦åˆ™è¿”å›0
+void clear(u16 a[]);//æ¸…é™¤æ•°ç»„é‡Œçš„å€¼
